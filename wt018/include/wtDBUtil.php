@@ -13,17 +13,25 @@
  *
  * @param $id
  *		the identifier of the desired database.
+ * @param $fallback_id
+ *    Optional. A fallback connection id which will be used if the first database is not
+ *    defined.   
  * @return
- *		the appropriate database connection, if exists, or the base connection used
+ *		the appropriate database connection, if exists, or the base/fallback connection used
  *		by the core.
  */ 
-function wtDBGetConnection($id)
+function wtDBGetConnection($id, $fallback_id=NULL)
 {
 	global $WT;
 	if(isset($WT->DBConnections[$id]))
 		return $WT->DBConnections[$id];
 	else
-		return $WT->DB;
+	{
+    if(!$fallback_id)	 
+		  return $WT->DB;
+		else
+		  return wtDBGetConnection($fallback_id);
+	}
 } 
   
 /** 
@@ -44,7 +52,7 @@ function wtDBGetConnection($id)
 function wtDBInstall($file, $db=NULL, $module=NULL)
 {
 	include(dirname(__FILE__)."/wtDBInstall.php");
-	
+	return $result;
 }
 	
 ?>

@@ -1,20 +1,26 @@
 <?php
 /**
- * @file
- * Database abstraction layer base class
+ * @brief Database abstraction layer base class
+ * 
+ * This class is intended to act as an abstraction layer for various database drivers. 
+ * It's a pure virtualization class and not recommended for direct use. To get a proper 
+ * database class instance, it's better to utilize Watchtowers @ref dbmanagement "database management"
+ * and use wtDBGetConnection().
  */
 
 class wtDB
 {
-	var $Query=""; // The last query
-	var $Name;
+	   var $Query=""; // The last query
+	   var $Name;
+     var $Prefix=NULL;
 
     var $mDB=NULL; // The database translator
     var $mResult=NULL;
-    var $mPrefix=NULL;
-    
+
+
     /**
-	 * Returns the connection status	 *
+	 * Returns the connection status
+	 *
 	 * @return
 	 *		TRUE if connected, otherwise FALSE
 	 */
@@ -22,15 +28,15 @@ class wtDB
     {
     	return $this->mConnected;
     }
-    
+
     /**
 	 * Returns the number of rows affected by a SELECT operation
 	 *
 	 * @param
 	 *		The query or NULL to use the last query
 	 * @return
-    *		An integer carrying the number of rows affected by the operation. 
-	 */    
+    *		An integer carrying the number of rows affected by the operation.
+	 */
     function count($q=NULL)
     {
     	if($q!==NULL)
@@ -41,7 +47,7 @@ class wtDB
     	if($this->mResult)
     		return $this->mDB->count($this->mResult);
     	else
-    		return FALSE;    		
+    		return FALSE;
     }
 
 	/**
@@ -53,8 +59,9 @@ class wtDB
 	 */
 	function connect($db_url)
 	{
-		$this->mConnected=false;	
-	
+		global $WT;
+		$this->mConnected=false;
+
 		// Parse the Url.
 		$url=wtUrlParse($db_url);
 
@@ -65,7 +72,7 @@ class wtDB
             	if(!$url['port'])
                 	$url['port']="3306";
 
-            	require_once($WT['IncludeDir']."wtDBTranslatorMySQL.php");
+            	 require_once($WT->CoreDir."include/wtDBTranslatorMySQL.php");
                 $this->mDB=new wtDBTranslatorMySQL();
             	break;
 
@@ -74,10 +81,12 @@ class wtDB
         }
 
       $this->mDB->mDB=&$this;
-      $this->mPrefix=$url['anchor'];
+      $this->Prefix=$url['anchor'];
       $this->Name=substr($url['path'], 1);
    	$this->mConnected=$this->mDB->connect($url['host'].":".$url['port'], $url['user'], $url['password'], $this->Name);
-   	
+
+   	wtCallHook("Core/OnDBConnect", $url, $this->mConnected);
+
    	return $this->mConnected;
 	 }
 
@@ -93,18 +102,25 @@ class wtDB
     {
     	if($this->mDB==NULL)
         	return false;
-        	
+
       $q=func_get_args();
-      $cq=count($q);	
+      $cq=count($q);
 		for($i=1;$i<$cq;$i++)
 		{
 			$q[$i]=mysql_real_escape_string($q[$i]);
-		}      
-      
-      $q=call_user_func_array("sprintf",$q);      
-      $q=str_replace("@P@", $this->mPrefix, $q);
-      
+		}
+
+      $q=call_user_func_array("sprintf",$q);
+      $q=str_replace("@P@", $this->Prefix, $q);
+
     	return $this->mDB->query($q);
+    }
+    
+    function lastId($table)
+    {
+      if($this->mDB==NULL)
+        	return false;
+      return $this->mDB->lastId($table);
     }
 
     /**
@@ -146,5 +162,6 @@ class wtDB
         	return false;
         return $this->mDB->error();
     }
-}
+}
+
 ?>

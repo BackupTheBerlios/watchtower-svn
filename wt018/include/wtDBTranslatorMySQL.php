@@ -40,6 +40,15 @@ class wtDBTranslatorMySQL
         $this->mDB->Query=$q;
     	return ($this->mDB->mResult?true:false);
     }
+    
+    function lastId($table)
+    {
+      $result=mysql_query("SELECT LAST_INSERT_ID() as `id` FROM `@P@".$table."`");
+      $row=mysql_fetch_assoc($result);
+      if($row)
+        return $row['id'];
+      return NULL;
+    }
 
     /**
 	 * Fetches the result of a database query

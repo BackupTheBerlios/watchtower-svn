@@ -11,9 +11,9 @@ CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = English
 BRIEF_MEMBER_DESC      = YES
 REPEAT_BRIEF           = YES
-ABBREVIATE_BRIEF       = "The $name class " \
-                         "The $name widget " \
-                         "The $name file " \
+ABBREVIATE_BRIEF       = "The $name class  " \
+                         "The $name widget  " \
+                         "The $name file  " \
                          is \
                          provides \
                          specifies \
@@ -82,12 +82,13 @@ WARNINGS               = YES
 WARN_IF_UNDOCUMENTED   = YES
 WARN_IF_DOC_ERROR      = YES
 WARN_NO_PARAMDOC       = NO
-WARN_FORMAT            = "$file:$line: $text "
+WARN_FORMAT            = "$file:$line: $text  "
 WARN_LOGFILE           = 
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = /mnt/HTDocs/dev/wt018/include
+INPUT                  = /mnt/HTDocs/dev/wt018/include \
+                         /mnt/HTDocs/dev/wt018/doc/info/
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.c \
                          *.cc \
@@ -111,11 +112,12 @@ FILE_PATTERNS          = *.c \
                          *.cs \
                          *.php \
                          *.php3 \
-                         *.inc \
+                         *.txt \
                          *.m \
                          *.mm \
                          *.dox \
-                         *.py
+                         *.py \
+                         *.txt
 RECURSIVE              = YES
 EXCLUDE                = 
 EXCLUDE_SYMLINKS       = NO
